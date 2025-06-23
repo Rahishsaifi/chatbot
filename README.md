@@ -7,7 +7,7 @@ Please follow these steps to run your Chabot project without any errors:
 1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey).
 2. Navigate to the API key section and create a new API key. It's free!
 
-Your API key will look something like this: AIzaSyAtpnKGX13bTgmx0l_gQeatYvdWvY_wOTQ
+Your API key will look something like this: AIzaSyAHp0DLb6SuVFj8ftzp9QyOHIkUuY40ZXE
 
 ## Insert Your API Key
 
