@@ -1,6 +1,8 @@
-# AI Chatbot Project Setup Guide
+# HR Assistant Chatbot - Leaves, Holidays & Attendance
 
-Please follow these steps to run your Chabot project without any errors:
+An AI-powered chatbot designed to help employees with queries related to Employee Leaves, Holidays, and Attendance management.
+
+Please follow these steps to run your Chatbot project without any errors:
 
 ## Get Your free API Key
 
@@ -24,19 +26,29 @@ Your API key will look something like this: AIzaSyAHp0DLb6SuVFj8ftzp9QyOHIkUuY40
 
 Click on the `localhost` link that appears in the terminal to open the project in your browser.
 
-## Customization Tips
+## Chatbot Features
 
-I've added dummy data for testing in `src/components/companyInfo.js`. You can replace it with your own data if you'd like. But if you want the chatbot to work and respond to all your queries without any data input, here's what to do:
+This HR Assistant chatbot is specifically designed to help employees with:
 
-Open the `src/App.jsx` and `src/components/ChatForm.jsx` files and make the following updates:
+- **Employee Leaves**: Leave applications, balance inquiries, leave policies, and leave types (CL, SL, PL, etc.)
+- **Holidays**: Company holidays, public holidays, holiday calendar, and holiday policies
+- **Attendance**: Attendance tracking, attendance policies, late arrivals, early departures, and attendance regularization
 
-```javascript
-// Line 10 (App.jsx)
-const [chatHistory, setChatHistory] = useState([]);
+The chatbot uses context-aware responses based on the information provided in `src/companyInfo.js`. You can customize this file with your organization's specific leave policies, holiday calendar, and attendance rules.
 
-// Line 40 (ChatForm.jsx)
-generateBotResponse([...chatHistory, { role: "user", text: userMessage }]);
-```
+## Customization
+
+To customize the chatbot for your organization:
+
+1. Update `src/companyInfo.js` with your specific:
+   - Leave policies and types
+   - Holiday calendar
+   - Attendance policies
+   - Company-specific rules and procedures
+
+2. Modify the welcome message in `src/App.jsx` (line 109) to match your organization's tone
+
+3. Update the intro screen in `src/components/IntroScreen.jsx` if needed
 
 ## Important Information
 
