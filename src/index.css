@@ -308,13 +308,16 @@ html, body {
 .chat-body .message {
   display: flex;
   gap: 11px;
-  align-items: center;
+  align-items: flex-start;
   opacity: 0;
   animation-fill-mode: forwards;
+  width: 100%;
 }
 
 .chat-body .bot-message {
   animation: botMessageSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  justify-content: flex-start;
+  max-width: 100%;
 }
 
 .chat-body .user-message {
@@ -453,7 +456,6 @@ html, body {
 
 .chat-body .message .message-text {
   padding: 12px 16px;
-  max-width: 75%;
   font-size: 0.95rem;
   word-wrap: break-word;
   white-space: pre-line;
@@ -512,6 +514,8 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.4);
   animation: messageTextPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 75%;
+  width: fit-content;
 }
 
 .chat-body .bot-message:hover .message-text {
@@ -522,6 +526,9 @@ html, body {
 
 .chat-body .user-message {
   flex-direction: column;
+  justify-content: flex-end;
+  margin-left: auto;
+  max-width: 75%;
   align-items: flex-end;
 }
 
@@ -538,6 +545,8 @@ html, body {
   overflow: hidden;
   animation: messageTextPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .chat-body .user-message:hover .message-text {
@@ -1971,4 +1980,178 @@ html, body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* UI Components Styles */
+.message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.bot-message .message-content {
+  width: 100%;
+  max-width: 75%;
+}
+
+.user-message .message-content {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.ui-components-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(9, 16, 152, 0.2);
+  box-shadow: 0 2px 8px rgba(9, 16, 152, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ui-component {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ui-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #091098;
+  margin-bottom: 4px;
+}
+
+.ui-date-input,
+.ui-dropdown,
+.ui-text-input {
+  padding: 12px 16px;
+  border: 1px solid rgba(9, 16, 152, 0.3);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #091098;
+  font-size: 0.95rem;
+  font-family: "Inter", sans-serif;
+  transition: all 0.3s ease;
+  width: 100%;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.ui-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(15%) sepia(95%) saturate(5000%) hue-rotate(230deg) brightness(0.6);
+  cursor: pointer;
+}
+
+.ui-date-input::-webkit-datetime-edit-text,
+.ui-date-input::-webkit-datetime-edit-month-field,
+.ui-date-input::-webkit-datetime-edit-day-field,
+.ui-date-input::-webkit-datetime-edit-year-field {
+  color: #091098;
+}
+
+.ui-date-input:focus,
+.ui-dropdown:focus,
+.ui-text-input:focus {
+  border-color: #091098;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(9, 16, 152, 0.1);
+}
+
+.ui-date-input:hover,
+.ui-dropdown:hover,
+.ui-text-input:hover {
+  border-color: #091098;
+  background: #ffffff;
+}
+
+.ui-dropdown {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23091098' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.ui-dropdown option {
+  background: #ffffff;
+  color: #091098;
+  padding: 8px;
+}
+
+.ui-hint {
+  font-size: 0.85rem;
+  color: rgba(9, 16, 152, 0.6);
+  margin-top: -4px;
+}
+
+.ui-text-form {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.ui-text-input {
+  flex: 1;
+}
+
+.ui-submit-btn {
+  padding: 12px 16px;
+  background: #6366f1;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  min-width: 48px;
+}
+
+.ui-submit-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.ui-submit-btn:active {
+  transform: translateY(0);
+}
+
+.ui-submit-btn .material-symbols-rounded {
+  font-size: 20px;
+}
+
+/* Theme adjustments for bot messages */
+.bot-message .ui-components-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(9, 16, 152, 0.2);
+}
+
+.bot-message .ui-label {
+  color: #091098;
+}
+
+.bot-message .ui-date-input,
+.bot-message .ui-dropdown,
+.bot-message .ui-text-input {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(9, 16, 152, 0.3);
+  color: #091098;
+}
+
+.bot-message .ui-date-input:focus,
+.bot-message .ui-dropdown:focus,
+.bot-message .ui-text-input:focus {
+  border-color: #091098;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(9, 16, 152, 0.1);
 }

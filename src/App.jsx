@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import ChatForm from "./components/ChatForm";
 import ChatMessage from "./components/ChatMessage";
 import IntroScreen from "./components/IntroScreen";
+import UIComponents from "./components/UIComponents";
 import { companyInfo } from "./companyInfo";
 
 const App = () => {
@@ -20,14 +21,33 @@ const App = () => {
     },
   ]);
 
-  const generateBotResponse = async (history) => {
+  const generateBotResponse = async (history, uiData = null) => {
     // Helper function to update chat history
-    const updateHistory = (text, isError = false) => {
-      setChatHistory((prev) => [...prev.filter((msg) => msg.text !== "Thinking"), { role: "model", text, isError }]);
+    const updateHistory = (text, isError = false, ui = null) => {
+      setChatHistory((prev) => [...prev.filter((msg) => msg.text !== "Thinking"), { 
+        role: "model", 
+        text, 
+        isError,
+        ui: ui || undefined
+      }]);
     };
 
     // Format chat history for API request
     history = history.map(({ role, text }) => ({ role, parts: [{ text }] }));
+
+    // If UI data is provided, format it for the server
+    let userMessage = history[history.length - 1]?.parts[0]?.text || "";
+    if (uiData && Object.keys(uiData).length > 0) {
+      // Format as pipe-separated key-value pairs
+      userMessage = Object.entries(uiData)
+        .map(([key, value]) => `${key}:${value}`)
+        .join("|");
+      // Update the last message with formatted data
+      history[history.length - 1] = {
+        role: "user",
+        parts: [{ text: userMessage }]
+      };
+    }
 
     const requestOptions = {
       method: "POST",
@@ -36,18 +56,94 @@ const App = () => {
     };
 
     try {
-      // Make the API call to get the bot's response
-      const response = await fetch(import.meta.env.VITE_API_URL, requestOptions);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.error.message || "Something went wrong!");
+      // Check if API URL is configured
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("API URL is not configured. Please set VITE_API_URL in .env file");
+      }
 
-      // Clean and update chat history with bot's response
-      const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
-      updateHistory(apiResponseText);
+      // Make the API call to get the bot's response
+      const response = await fetch(apiUrl, requestOptions);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || errorData?.error || `Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Handle server response format
+      let responseText = "";
+      let responseUI = null;
+
+      if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+        // Clean and get response text
+        responseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
+      } else if (data.text) {
+        // Direct text response (fallback format)
+        responseText = data.text;
+      } else {
+        throw new Error("Unexpected response format from server");
+      }
+
+      // Check for UI components
+      if (data.ui && data.ui.hasComponents) {
+        responseUI = data.ui;
+      }
+
+      updateHistory(responseText, false, responseUI);
     } catch (error) {
       // Update chat history with the error message
-      updateHistory(error.message, true);
+      console.error("API Error:", error);
+      updateHistory(error.message || "Failed to get response from server. Please make sure the server is running on port 3000.", true);
     }
+  };
+
+  // Handle UI component selection
+  const handleUIComponentSelect = (field, value) => {
+    // Get the last bot message with UI components
+    const lastBotMessageIndex = [...chatHistory].reverse().findIndex(msg => msg.role === "model" && msg.ui);
+    
+    if (lastBotMessageIndex !== -1) {
+      const actualIndex = chatHistory.length - 1 - lastBotMessageIndex;
+      const lastBotMessage = chatHistory[actualIndex];
+      const uiComponents = lastBotMessage.ui;
+      
+      // Store the selected value in the message's UI state
+      const updatedUI = {
+        ...lastBotMessage.ui,
+        [field]: {
+          ...uiComponents[field],
+          selectedValue: value
+        }
+      };
+      
+      // Update the chat history with the selected value
+      setChatHistory(prev => {
+        const updated = [...prev];
+        updated[actualIndex] = {
+          ...lastBotMessage,
+          ui: updatedUI
+        };
+        return updated;
+      });
+      
+      // For datePicker and dropdown, auto-submit when selected
+      if (uiComponents[field]?.type === "datePicker" || uiComponents[field]?.type === "dropdown") {
+        // Auto-submit after a short delay to allow UI to update
+        setTimeout(() => {
+          const uiData = { [field]: value };
+          generateBotResponse(chatHistory, uiData);
+        }, 300);
+      }
+      // For textInput, wait for explicit submit (handled in TextInput component)
+    }
+  };
+
+  // Handle UI component submission (for text inputs)
+  const handleUISubmit = (field, value) => {
+    const uiData = { [field]: value };
+    generateBotResponse(chatHistory, uiData);
   };
 
   useEffect(() => {
@@ -244,7 +340,12 @@ const App = () => {
 
               {/* Render the chat history dynamically */}
               {chatHistory.map((chat, index) => (
-                <ChatMessage key={index} chat={chat} />
+                <ChatMessage 
+                  key={index} 
+                  chat={chat} 
+                  onUIComponentSelect={handleUIComponentSelect}
+                  onUISubmit={handleUISubmit}
+                />
               ))}
             </div>
 
